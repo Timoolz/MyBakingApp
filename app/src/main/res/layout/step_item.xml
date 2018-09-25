@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:background="@drawable/layout_background"
+    android:padding="10dp"
+    android:layout_margin="5dp">
+
+
+    <TextView
+        android:id="@+id/tv_stepNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal"
+        android:textAlignment="center"
+        android:textAllCaps="true"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        tools:text="@string/app_dummy_number" />
+
+    <TextView
+        android:id="@+id/tv_shortDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal"
+        android:textAlignment="center"
+        android:textAllCaps="true"
+        android:textSize="12sp"
+
+        tools:text="@string/app_dummy_text_medium"
+        android:maxLines="1"
+        android:ellipsize="end"
+
+        />
+
+</LinearLayout>

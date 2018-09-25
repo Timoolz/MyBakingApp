@@ -3,30 +3,49 @@ package com.olamide.mybakingapp.activity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.olamide.mybakingapp.R;
+import com.olamide.mybakingapp.adapter.RecipeAdapter;
 import com.olamide.mybakingapp.bean.Recipe;
 import com.olamide.mybakingapp.utils.network.RecipeService;
-import com.olamide.mybakingapp.utils.network.RecipesAPI;
-import com.olamide.mybakingapp.utils.network.RetrofitBuilder;
-
-import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements RecipeAdapter.RecipeAdapterOnClickListener{
 
     private Call<List<Recipe>> recipeCall;
 
     List<Recipe> recipeList = new ArrayList<>();
     GridLayoutManager layoutManager;
+    RecipeAdapter recipeAdapter;
+
+
+    @BindView(R.id.rv_recipe)
+    RecyclerView mRvRecipeList;
+    @BindView(R.id.pb_loading)
+    ProgressBar pbLoading;
+    @BindView(R.id.button_retry)
+    Button retryButton;
+    @BindView(R.id.tv_connectionError)
+    TextView textViewConnectionError;
+    @BindView(R.id.textView_welcome)
+    TextView textViewWelcome;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +53,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Timber.plant(new Timber.DebugTree());
+        ButterKnife.bind(this);
+
+        //int spanCount = RecyclerViewUtils.getSpanCount(mRvRecipeList, this.getResources().getDimension(R.dimen.movie_layout_width));
+
+
+        layoutManager = new GridLayoutManager(this, 1);
+        mRvRecipeList.setLayoutManager(layoutManager);
+        recipeAdapter = new RecipeAdapter(recipeList,this,R.layout.recipe_item,this);
+        mRvRecipeList.setAdapter(recipeAdapter);
 
         getRecipeList();
     }
@@ -44,12 +72,15 @@ public class MainActivity extends AppCompatActivity {
     private void getRecipeList() {
 
 
+        startLoading();
         recipeCall = RecipeService.getRecipes();
         recipeCall.enqueue(new Callback<List<Recipe>>() {
             @Override
             public void onResponse(Call<List<Recipe>> call, Response<List<Recipe>> response) {
                 recipeList = response.body();
-                Timber.e(ToStringBuilder.reflectionToString(response.body()));
+                //Timber.e(ToStringBuilder.reflectionToString(response.body()));
+                recipeAdapter.setRecipeList(recipeList);
+                stopLoading();
                 //Toast.makeText(getApplicationContext(),"success",  Toast.LENGTH_LONG).show();
 
             }
@@ -57,10 +88,39 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<List<Recipe>> call, Throwable t) {
                 Timber.e(t);
+                showError();
                 //Toast.makeText(getApplicationContext(),"failure",  Toast.LENGTH_LONG).show();
 
             }
 
         });
     }
+
+    @Override
+    public void onClickListener(Recipe recipe) {
+        Toast.makeText(this, recipe.getName() + "  has been chosen", Toast.LENGTH_SHORT).show();
+    }
+
+
+    private void startLoading() {
+        textViewWelcome.setVisibility(View.INVISIBLE);
+        retryButton.setVisibility(View.INVISIBLE);
+        textViewConnectionError.setVisibility(View.INVISIBLE);
+        pbLoading.setVisibility(View.VISIBLE);
+    }
+
+    private void stopLoading() {
+        textViewWelcome.setVisibility(View.VISIBLE);
+        pbLoading.setVisibility(View.INVISIBLE);
+    }
+
+    private void showError() {
+        textViewWelcome.setVisibility(View.INVISIBLE);
+        retryButton.setVisibility(View.VISIBLE);
+        textViewConnectionError.setVisibility(View.VISIBLE);
+        pbLoading.setVisibility(View.INVISIBLE);
+    }
+
+
+
 }
