@@ -9,6 +9,7 @@
     <string name="internet_error">Action requires network connection.  Connect to the Internet and try Again </string>
     <string name="welcome_text">Welcome\n What would you want to Prepare? </string>
     <string name="description">Description</string>
+    <string name="ingredients">Ingredients</string>
     <string name="next">Next</string>
     <string name="prev">Prev</string>
 

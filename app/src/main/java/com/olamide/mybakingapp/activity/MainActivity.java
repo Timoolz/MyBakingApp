@@ -1,5 +1,6 @@
 package com.olamide.mybakingapp.activity;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -55,10 +56,11 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
         Timber.plant(new Timber.DebugTree());
         ButterKnife.bind(this);
 
-        //int spanCount = RecyclerViewUtils.getSpanCount(mRvRecipeList, this.getResources().getDimension(R.dimen.movie_layout_width));
+
+        int spanCount = this.getResources().getInteger(R.integer.span_count);
 
 
-        layoutManager = new GridLayoutManager(this, 1);
+        layoutManager = new GridLayoutManager(this, spanCount);
         mRvRecipeList.setLayoutManager(layoutManager);
         recipeAdapter = new RecipeAdapter(recipeList,this,R.layout.recipe_item,this);
         mRvRecipeList.setAdapter(recipeAdapter);
@@ -98,7 +100,9 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
 
     @Override
     public void onClickListener(Recipe recipe) {
-        Toast.makeText(this, recipe.getName() + "  has been chosen", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, IngredientAndStepsActivity.class);
+        intent.putExtra("RECIPE_STRING", recipe);
+        startActivity(intent);
     }
 
 
