@@ -29,7 +29,9 @@ public class IngredientAndStepsActivity extends AppCompatActivity implements Ste
         if (extras != null) {
             try {
                 Intent i = getIntent();
-                recipe = i.getExtras().getParcelable("RECIPE_STRING");
+                recipe = i.getParcelableExtra("RECIPE_STRING");
+                Timber.e(recipe.getName());
+                this.setTitle(recipe.getName());
 
             } catch (Exception ex) {
                 Timber.e(ex);

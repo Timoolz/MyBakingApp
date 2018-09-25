@@ -84,7 +84,7 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepAdapterVie
         Step step = steps.get(holder.getAdapterPosition());
 
         //Set values
-        holder.tStepNumber.setText(step.getId());
+        holder.tStepNumber.setText(step.getId().toString());
         holder.tShortDescription.setText(step.getShortDescription());
 
     }

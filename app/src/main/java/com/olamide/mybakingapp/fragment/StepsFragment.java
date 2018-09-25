@@ -88,12 +88,10 @@ public class StepsFragment extends Fragment implements StepAdapter.StepAdapterOn
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        //ButterKnife.bind(this.getActivity());
         // Inflate the layout for this fragment
 
         View rootView = inflater.inflate(R.layout.fragment_steps, container, false);
-
+        ButterKnife.bind(this,rootView);
         IngredientAndStepsActivity parentActivity = (IngredientAndStepsActivity) getActivity();
         stepList = parentActivity.getRecipe().getSteps();
 

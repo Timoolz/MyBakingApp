@@ -109,8 +109,8 @@ public class Recipe implements Parcelable {
 
             List<Ingredient> recipeIngredients = new ArrayList<>();
             List<Step> recipeSteps = new ArrayList<>();
-            source.readList(recipeIngredients, null);
-            source.readList(recipeSteps, null);
+            source.readTypedList(recipeIngredients, Ingredient.CREATOR);
+            source.readTypedList(recipeSteps, Step.CREATOR);
             recipe.setSteps(recipeSteps);
             recipe.setIngredients(recipeIngredients);
             return recipe;
