@@ -14,7 +14,9 @@ import android.widget.Toast;
 
 import com.olamide.mybakingapp.R;
 import com.olamide.mybakingapp.activity.IngredientAndStepsActivity;
+import com.olamide.mybakingapp.activity.MainActivity;
 import com.olamide.mybakingapp.adapter.StepAdapter;
+import com.olamide.mybakingapp.bean.Recipe;
 import com.olamide.mybakingapp.bean.Step;
 
 import java.util.ArrayList;
@@ -85,15 +87,27 @@ public class StepsFragment extends Fragment implements StepAdapter.StepAdapterOn
 //        }
 //    }
 
+//        @Override
+//    public void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//
+//    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
+        Recipe recipe1 = getArguments().getParcelable(MainActivity.RECIPE_STRING);
+        if (getArguments() != null) {
+            Recipe recipe = getArguments().getParcelable(MainActivity.RECIPE_STRING);
+            stepList = recipe.getSteps();
+        }
+
         View rootView = inflater.inflate(R.layout.fragment_steps, container, false);
         ButterKnife.bind(this,rootView);
-        IngredientAndStepsActivity parentActivity = (IngredientAndStepsActivity) getActivity();
-        stepList = parentActivity.getRecipe().getSteps();
+//        IngredientAndStepsActivity parentActivity = (IngredientAndStepsActivity) getActivity();
+//        stepList = parentActivity.getRecipe().getSteps();
 
         layoutManager = new LinearLayoutManager(this.getActivity(), LinearLayoutManager.VERTICAL, false);
         mRvSteps.setHasFixedSize(true);

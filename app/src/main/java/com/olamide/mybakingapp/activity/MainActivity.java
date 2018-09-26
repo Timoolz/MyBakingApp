@@ -28,6 +28,8 @@ import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements RecipeAdapter.RecipeAdapterOnClickListener{
 
+    public static final String RECIPE_STRING = "recipe";
+
     private Call<List<Recipe>> recipeCall;
 
     List<Recipe> recipeList = new ArrayList<>();
@@ -101,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
     @Override
     public void onClickListener(Recipe recipe) {
         Intent intent = new Intent(this, IngredientAndStepsActivity.class);
-        intent.putExtra("RECIPE_STRING", recipe);
+        intent.putExtra(RECIPE_STRING, recipe);
         startActivity(intent);
     }
 

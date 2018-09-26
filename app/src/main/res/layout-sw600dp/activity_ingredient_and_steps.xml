@@ -21,11 +21,11 @@
             android:padding="10dp"
             android:layout_gravity="center"
             android:layout_margin="10dp"/>
-        <fragment
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/steps_fragment"
-            android:name="com.olamide.mybakingapp.fragment.StepsFragment"/>
+            android:id="@+id/steps_container"
+            />
 
     </LinearLayout>
 
