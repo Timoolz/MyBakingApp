@@ -1,6 +1,7 @@
 package com.olamide.mybakingapp.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,10 +15,12 @@ import android.widget.Toast;
 
 import com.olamide.mybakingapp.R;
 import com.olamide.mybakingapp.activity.IngredientAndStepsActivity;
+import com.olamide.mybakingapp.activity.IngredientStepsDetailsActivity;
 import com.olamide.mybakingapp.activity.MainActivity;
 import com.olamide.mybakingapp.adapter.StepAdapter;
 import com.olamide.mybakingapp.bean.Recipe;
 import com.olamide.mybakingapp.bean.Step;
+import com.olamide.mybakingapp.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +36,8 @@ import butterknife.ButterKnife;
  * Use the {@link StepsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class StepsFragment extends Fragment implements StepAdapter.StepAdapterOnClickListener {
+public class StepsFragment extends Fragment implements StepAdapter.StepAdapterOnClickListener,
+        StepDetailsFragment.OnFragmentInteractionListener {
 
 
     LinearLayoutManager layoutManager;
@@ -41,6 +45,7 @@ public class StepsFragment extends Fragment implements StepAdapter.StepAdapterOn
     @BindView(R.id.rv_steps)
     RecyclerView mRvSteps;
 
+    private Recipe recipe;
     List<Step> stepList = new ArrayList<>();
 
 
@@ -50,14 +55,7 @@ public class StepsFragment extends Fragment implements StepAdapter.StepAdapterOn
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment StepsFragment.
-     */
+
 //    // TODO: Rename and change types and number of parameters
 //    public static StepsFragment newInstance(String param1, String param2) {
 //        StepsFragment fragment = new StepsFragment();
@@ -86,7 +84,7 @@ public class StepsFragment extends Fragment implements StepAdapter.StepAdapterOn
 
 
         if (getArguments() != null) {
-            Recipe recipe = getArguments().getParcelable(MainActivity.RECIPE_STRING);
+            recipe = getArguments().getParcelable(MainActivity.RECIPE_STRING);
             stepList = recipe.getSteps();
         }
 
@@ -136,6 +134,29 @@ public class StepsFragment extends Fragment implements StepAdapter.StepAdapterOn
     public void onClickListener(Step step) {
 
         Toast.makeText(getContext(), step.getShortDescription() + "  has been chosen", Toast.LENGTH_SHORT).show();
+
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(StepDetailsFragment.STEP_STRING,step);
+        bundle.putParcelable(MainActivity.RECIPE_STRING, recipe);
+        if(Utils.isTablet(getContext())){
+
+            StepDetailsFragment detailsFragment = new StepDetailsFragment();
+            detailsFragment.setArguments(bundle);
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.ingredients_details_container, detailsFragment)
+                    .commit();
+        }else {
+            Intent intent = new Intent(getContext(), IngredientStepsDetailsActivity.class);
+            bundle.putString(IngredientAndStepsActivity.TYPE_STRING,"step");
+            intent.putExtras(bundle);
+            startActivity(intent);
+
+        }
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 
     /**

@@ -10,6 +10,7 @@ import android.widget.Toast;
 import com.olamide.mybakingapp.R;
 import com.olamide.mybakingapp.bean.Recipe;
 import com.olamide.mybakingapp.fragment.IngredientsFragment;
+import com.olamide.mybakingapp.fragment.StepDetailsFragment;
 import com.olamide.mybakingapp.fragment.StepsFragment;
 import com.olamide.mybakingapp.utils.Utils;
 
@@ -17,9 +18,12 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import timber.log.Timber;
 
-public class IngredientAndStepsActivity extends AppCompatActivity implements StepsFragment.OnFragmentInteractionListener{
+public class IngredientAndStepsActivity extends AppCompatActivity implements StepsFragment.OnFragmentInteractionListener,
+        StepDetailsFragment.OnFragmentInteractionListener{
 
     public Recipe recipe;
+
+    public final static String TYPE_STRING = "typeString";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +82,8 @@ public class IngredientAndStepsActivity extends AppCompatActivity implements Ste
                     .replace(R.id.ingredients_details_container, ingredientsFragment)
                     .commit();
         }else {
-            Intent intent = new Intent(this, IngredientDetailsActivity.class);
+            Intent intent = new Intent(this, IngredientStepsDetailsActivity.class);
+            bundle.putString(TYPE_STRING,"ingre");
             intent.putExtras(bundle);
             startActivity(intent);
 

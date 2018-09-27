@@ -6,6 +6,6 @@
     android:layout_height="match_parent"
     android:background="@color/appBackground"
     android:id="@+id/ingredients_details_container__"
-    tools:context=".activity.IngredientDetailsActivity">
+    tools:context=".activity.IngredientStepsDetailsActivity">
 
 </FrameLayout>
