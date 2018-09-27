@@ -11,8 +11,10 @@ import com.olamide.mybakingapp.R;
 import com.olamide.mybakingapp.bean.Recipe;
 import com.olamide.mybakingapp.fragment.IngredientsFragment;
 import com.olamide.mybakingapp.fragment.StepsFragment;
+import com.olamide.mybakingapp.utils.Utils;
 
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import timber.log.Timber;
 
 public class IngredientAndStepsActivity extends AppCompatActivity implements StepsFragment.OnFragmentInteractionListener{
@@ -51,11 +53,38 @@ public class IngredientAndStepsActivity extends AppCompatActivity implements Ste
                 .commit();
 
 
+        if(Utils.isTablet(this)){
+            IngredientsFragment ingredientsFragment = new IngredientsFragment();
+            ingredientsFragment.setArguments(bundle);
+            fragmentManager.beginTransaction()
+                    .add(R.id.ingredients_details_container, ingredientsFragment)
+                    .commit();
+        }
+
     }
 
-    public Recipe getRecipe() {
-        return recipe;
+
+    @OnClick(R.id.tv_ingredient)
+    void displayIngredientDetails(){
+
+        Toast.makeText(this,"Ingredients are to be displayed", Toast.LENGTH_SHORT).show();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(MainActivity.RECIPE_STRING, recipe);
+        if(Utils.isTablet(getApplicationContext())){
+
+            IngredientsFragment ingredientsFragment = new IngredientsFragment();
+            ingredientsFragment.setArguments(bundle);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.ingredients_details_container, ingredientsFragment)
+                    .commit();
+        }else {
+            Intent intent = new Intent(this, IngredientDetailsActivity.class);
+            intent.putExtras(bundle);
+            startActivity(intent);
+
+        }
     }
+
 
     @Override
     public void onFragmentInteraction(Uri uri) {

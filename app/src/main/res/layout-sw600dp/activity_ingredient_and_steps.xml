@@ -32,10 +32,10 @@
     </LinearLayout>
 
     <!-- A small divider -->
-    <View
-        android:layout_width="1dp"
-        android:layout_height="match_parent"
-        android:background="@android:color/darker_gray" />
+    <!--<View-->
+        <!--android:layout_width="1dp"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:background="@android:color/darker_gray" />-->
 
     <FrameLayout
         android:layout_width="match_parent"
