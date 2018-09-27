@@ -98,7 +98,7 @@ public class StepsFragment extends Fragment implements StepAdapter.StepAdapterOn
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        Recipe recipe1 = getArguments().getParcelable(MainActivity.RECIPE_STRING);
+
         if (getArguments() != null) {
             Recipe recipe = getArguments().getParcelable(MainActivity.RECIPE_STRING);
             stepList = recipe.getSteps();
