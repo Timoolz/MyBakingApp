@@ -1,6 +1,9 @@
 package com.olamide.mybakingapp.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Parcelable;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -11,6 +14,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.olamide.mybakingapp.BundleConstants;
 import com.olamide.mybakingapp.R;
 import com.olamide.mybakingapp.adapter.RecipeAdapter;
 import com.olamide.mybakingapp.bean.Recipe;
@@ -28,7 +32,7 @@ import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements RecipeAdapter.RecipeAdapterOnClickListener{
 
-    public static final String RECIPE_STRING = "recipe";
+
 
     private Call<List<Recipe>> recipeCall;
 
@@ -58,16 +62,22 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
         Timber.plant(new Timber.DebugTree());
         ButterKnife.bind(this);
 
-
         int spanCount = this.getResources().getInteger(R.integer.span_count);
-
 
         layoutManager = new GridLayoutManager(this, spanCount);
         mRvRecipeList.setLayoutManager(layoutManager);
         recipeAdapter = new RecipeAdapter(recipeList,this,R.layout.recipe_item,this);
         mRvRecipeList.setAdapter(recipeAdapter);
 
-        getRecipeList();
+        if( savedInstanceState != null){
+            recipeList = savedInstanceState.getParcelableArrayList(BundleConstants.RECIPE_LIST_STRING);
+            recipeAdapter.setRecipeList(recipeList);
+            stopLoading();
+        }else {
+            getRecipeList();
+        }
+
+
     }
 
 
@@ -101,9 +111,22 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
     }
 
     @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putParcelableArrayList(BundleConstants.RECIPE_LIST_STRING, (ArrayList<? extends Parcelable>) recipeList);
+    }
+
+    @Override
     public void onClickListener(Recipe recipe) {
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences.Editor editor = preferences.edit();
+        
+        editor.putString(BundleConstants.TYPE_STRING,"ingre");
+        editor.apply();
+
         Intent intent = new Intent(this, IngredientAndStepsActivity.class);
-        intent.putExtra(RECIPE_STRING, recipe);
+        intent.putExtra(BundleConstants.RECIPE_STRING, recipe);
         startActivity(intent);
     }
 

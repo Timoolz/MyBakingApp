@@ -2,8 +2,10 @@ package com.olamide.mybakingapp.fragment;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.olamide.mybakingapp.BundleConstants;
 import com.olamide.mybakingapp.R;
 import com.olamide.mybakingapp.activity.IngredientAndStepsActivity;
 import com.olamide.mybakingapp.activity.IngredientStepsDetailsActivity;
@@ -84,7 +87,7 @@ public class StepsFragment extends Fragment implements StepAdapter.StepAdapterOn
 
 
         if (getArguments() != null) {
-            recipe = getArguments().getParcelable(MainActivity.RECIPE_STRING);
+            recipe = getArguments().getParcelable(BundleConstants.RECIPE_STRING);
             stepList = recipe.getSteps();
         }
 
@@ -131,13 +134,21 @@ public class StepsFragment extends Fragment implements StepAdapter.StepAdapterOn
     }
 
     @Override
-    public void onClickListener(Step step) {
+    public void onClickListener(Step step, int adapterPositon) {
 
         Toast.makeText(getContext(), step.getShortDescription() + "  has been chosen", Toast.LENGTH_SHORT).show();
 
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(BundleConstants.STEP_INT, adapterPositon);
+        editor.putString(BundleConstants.TYPE_STRING,"step");
+        editor.apply();
+
         Bundle bundle = new Bundle();
-        bundle.putParcelable(StepDetailsFragment.STEP_STRING,step);
-        bundle.putParcelable(MainActivity.RECIPE_STRING, recipe);
+        bundle.putParcelable(BundleConstants.STEP_STRING,step);
+        bundle.putInt(BundleConstants.STEP_INT, adapterPositon);
+        bundle.putParcelable(BundleConstants.RECIPE_STRING, recipe);
         if(Utils.isTablet(getContext())){
 
             StepDetailsFragment detailsFragment = new StepDetailsFragment();
@@ -147,7 +158,7 @@ public class StepsFragment extends Fragment implements StepAdapter.StepAdapterOn
                     .commit();
         }else {
             Intent intent = new Intent(getContext(), IngredientStepsDetailsActivity.class);
-            bundle.putString(IngredientAndStepsActivity.TYPE_STRING,"step");
+            bundle.putString(BundleConstants.TYPE_STRING,"step");
             intent.putExtras(bundle);
             startActivity(intent);
 

@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import com.olamide.mybakingapp.BundleConstants;
 import com.olamide.mybakingapp.R;
 import com.olamide.mybakingapp.bean.Recipe;
 import com.olamide.mybakingapp.bean.Step;
@@ -21,6 +22,7 @@ public class IngredientStepsDetailsActivity extends AppCompatActivity implements
 
     private String currentType;
 
+    private int currentStepInt = 0;
     private Step currentStep;
 
     @Override
@@ -37,16 +39,27 @@ public class IngredientStepsDetailsActivity extends AppCompatActivity implements
             try {
                 Intent i = getIntent();
 
-                currentType = i.getStringExtra(IngredientAndStepsActivity.TYPE_STRING);
+                currentType = i.getStringExtra(BundleConstants.TYPE_STRING);
                 if(currentType.equals("step")){
-                    currentStep = i.getParcelableExtra(StepDetailsFragment.STEP_STRING);
+                    currentStep = i.getParcelableExtra(BundleConstants.STEP_STRING);
                 }
-                recipe = i.getParcelableExtra(MainActivity.RECIPE_STRING);
+                recipe = i.getParcelableExtra(BundleConstants.RECIPE_STRING);
+                currentStepInt = i.getIntExtra(BundleConstants.STEP_INT,0);
 
             } catch (Exception ex) {
                 Timber.e(ex);
                 Toast.makeText(this,"An Error Has Occured", Toast.LENGTH_LONG).show();
             }
+        }
+
+
+        if (savedInstanceState != null){
+            recipe = savedInstanceState.getParcelable(BundleConstants.RECIPE_STRING);
+            currentType = savedInstanceState.getString(BundleConstants.TYPE_STRING);
+//            if(currentType.equals("step")){
+//                currentStep = savedInstanceState.getParcelable(BundleConstants.STEP_STRING);
+//                currentStepInt = savedInstanceState.getInt(BundleConstants.STEP_INT);
+//            }
         }
 
         //Timber.e(recipe.getName());
@@ -55,7 +68,7 @@ public class IngredientStepsDetailsActivity extends AppCompatActivity implements
         if(currentType.equals("ingre")){
 
             Bundle bundle = new Bundle();
-            bundle.putParcelable(MainActivity.RECIPE_STRING, recipe);
+            bundle.putParcelable(BundleConstants.RECIPE_STRING, recipe);
 
             IngredientsFragment ingredientsFragment = new IngredientsFragment();
             ingredientsFragment.setArguments(bundle);
@@ -66,8 +79,9 @@ public class IngredientStepsDetailsActivity extends AppCompatActivity implements
         }else if(currentType.equals("step")){
 
             Bundle bundle = new Bundle();
-            bundle.putParcelable(MainActivity.RECIPE_STRING, recipe);
-            bundle.putParcelable(StepDetailsFragment.STEP_STRING, currentStep);
+            bundle.putParcelable(BundleConstants.RECIPE_STRING, recipe);
+            bundle.putParcelable(BundleConstants.STEP_STRING, currentStep);
+            bundle.putInt(BundleConstants.STEP_INT,currentStepInt);
 
             StepDetailsFragment stepDetailsFragment = new StepDetailsFragment();
             stepDetailsFragment.setArguments(bundle);
@@ -79,6 +93,19 @@ public class IngredientStepsDetailsActivity extends AppCompatActivity implements
 
 
     }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putParcelable(BundleConstants.RECIPE_STRING,  recipe);
+        savedInstanceState.putString(BundleConstants.TYPE_STRING,currentType);
+        if(currentType.equals("step")){
+            savedInstanceState.putParcelable(BundleConstants.STEP_STRING,currentStep);
+            savedInstanceState.putInt(BundleConstants.STEP_INT,currentStepInt);
+        }
+    }
+
 
     @Override
     public void onFragmentInteraction(Uri uri) {

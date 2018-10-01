@@ -1,8 +1,10 @@
 package com.olamide.mybakingapp.fragment;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -11,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.olamide.mybakingapp.BundleConstants;
 import com.olamide.mybakingapp.R;
 import com.olamide.mybakingapp.activity.MainActivity;
 import com.olamide.mybakingapp.bean.Recipe;
@@ -19,6 +22,7 @@ import com.olamide.mybakingapp.utils.Utils;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
@@ -31,6 +35,8 @@ public class StepDetailsFragment extends Fragment {
 
     private List<Step> stepList = new ArrayList<>();
     private Step currentStep;
+    private int currentStepInt = 0;
+    private Recipe recipe;
 
     @BindView(R.id.iv_back_drop)
     ImageView ivBackDrop;
@@ -44,7 +50,6 @@ public class StepDetailsFragment extends Fragment {
     @BindView(R.id.step_next)
     FloatingActionButton btNext;
 
-    public static final String STEP_STRING = "currentStep";
 
 
 
@@ -94,11 +99,31 @@ public class StepDetailsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        if (getArguments() != null) {
-            Recipe recipe = getArguments().getParcelable(MainActivity.RECIPE_STRING);
+
+        if (savedInstanceState != null){
+            recipe = savedInstanceState.getParcelable(BundleConstants.RECIPE_STRING);
             stepList = recipe.getSteps();
-            currentStep = getArguments().getParcelable(STEP_STRING);
+            //currentStep = savedInstanceState.getParcelable(BundleConstants.STEP_STRING);
+            //currentStepInt = savedInstanceState.getInt(BundleConstants.STEP_INT);
+            //currentStep = stepList.get(currentStepInt);
+
+        }else{
+            if (getArguments() != null) {
+
+
+                Bundle testB = getArguments();
+                recipe = testB.getParcelable(BundleConstants.RECIPE_STRING);
+                stepList = recipe.getSteps();
+                //currentStep = testB.getParcelable(BundleConstants.STEP_STRING);
+                //currentStepInt = testB.getInt(BundleConstants.STEP_INT);
+            }
         }
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        currentStepInt = preferences.getInt(BundleConstants.STEP_INT,0);
+        currentStep = stepList.get(currentStepInt);
+
+
         View rootView =  inflater.inflate(R.layout.fragment_step_details, container, false);
         ButterKnife.bind(this,rootView);
 
@@ -115,13 +140,29 @@ public class StepDetailsFragment extends Fragment {
 //    }
 
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putParcelable(BundleConstants.RECIPE_STRING,  recipe);
+        savedInstanceState.putParcelable(BundleConstants.STEP_STRING,currentStep);
+        savedInstanceState.putInt(BundleConstants.STEP_INT, currentStepInt);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(BundleConstants.STEP_INT, currentStepInt);
+
+        editor.apply();
+
+    }
+
+
+
     void populateViews(){
         if(Utils.isTablet(getContext())){
             hideToggles();
         }else{
-            if(currentStep.getId() <= 0){
+            if(currentStepInt <= 0){
                 showNextToggle();
-            }else if(currentStep.getId() >= stepList.size()-1){
+            }else if(currentStepInt >= stepList.size()-1){
                 showPrevToggle();
             }else {
                 showToggles();
@@ -143,13 +184,15 @@ public class StepDetailsFragment extends Fragment {
 
     @OnClick(R.id.step_prev)
     void goPrevious(){
-        currentStep = stepList.get(currentStep.getId()-1);
+        currentStepInt--;
+        currentStep = stepList.get(currentStepInt);
         populateViews();
     }
 
     @OnClick(R.id.step_next)
     void goNext(){
-        currentStep = stepList.get(currentStep.getId()+1);
+        currentStepInt++;
+        currentStep = stepList.get(currentStepInt );
         populateViews();
     }
 

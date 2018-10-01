@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.olamide.mybakingapp.BundleConstants;
 import com.olamide.mybakingapp.R;
 import com.olamide.mybakingapp.activity.MainActivity;
 import com.olamide.mybakingapp.adapter.IngredientAdapter;
@@ -44,7 +45,7 @@ public class IngredientsFragment extends Fragment {
 
 
         if (getArguments() != null) {
-            Recipe recipe = getArguments().getParcelable(MainActivity.RECIPE_STRING);
+            Recipe recipe = getArguments().getParcelable(BundleConstants.RECIPE_STRING);
             ingredientList = recipe.getIngredients();
         }
 

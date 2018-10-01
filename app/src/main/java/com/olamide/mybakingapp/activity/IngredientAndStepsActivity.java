@@ -1,12 +1,15 @@
 package com.olamide.mybakingapp.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import com.olamide.mybakingapp.BundleConstants;
 import com.olamide.mybakingapp.R;
 import com.olamide.mybakingapp.bean.Recipe;
 import com.olamide.mybakingapp.fragment.IngredientsFragment;
@@ -23,7 +26,8 @@ public class IngredientAndStepsActivity extends AppCompatActivity implements Ste
 
     public Recipe recipe;
 
-    public final static String TYPE_STRING = "typeString";
+    private String typeString;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +40,7 @@ public class IngredientAndStepsActivity extends AppCompatActivity implements Ste
         if (extras != null) {
             try {
                 Intent i = getIntent();
-                recipe = i.getParcelableExtra(MainActivity.RECIPE_STRING);
+                recipe = i.getParcelableExtra(BundleConstants.RECIPE_STRING);
                 Timber.e(recipe.getName());
                 this.setTitle(recipe.getName());
 
@@ -46,10 +50,19 @@ public class IngredientAndStepsActivity extends AppCompatActivity implements Ste
             }
         }
 
+        if (savedInstanceState != null){
+            recipe = savedInstanceState.getParcelable(BundleConstants.RECIPE_STRING);
+            typeString = savedInstanceState.getString(BundleConstants.TYPE_STRING);
+        }
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        typeString = preferences.getString(BundleConstants.TYPE_STRING,"ingre");
+
+
         FragmentManager fragmentManager = getSupportFragmentManager();
 
         Bundle bundle = new Bundle();
-        bundle.putParcelable(MainActivity.RECIPE_STRING, recipe);
+        bundle.putParcelable(BundleConstants.RECIPE_STRING, recipe);
         StepsFragment stepsFragment = new StepsFragment();
         stepsFragment.setArguments(bundle);
         fragmentManager.beginTransaction()
@@ -58,22 +71,47 @@ public class IngredientAndStepsActivity extends AppCompatActivity implements Ste
 
 
         if(Utils.isTablet(this)){
-            IngredientsFragment ingredientsFragment = new IngredientsFragment();
-            ingredientsFragment.setArguments(bundle);
-            fragmentManager.beginTransaction()
-                    .add(R.id.ingredients_details_container, ingredientsFragment)
-                    .commit();
+
+            if(typeString.equalsIgnoreCase("ingre")){
+                IngredientsFragment ingredientsFragment = new IngredientsFragment();
+                ingredientsFragment.setArguments(bundle);
+                fragmentManager.beginTransaction()
+                        .add(R.id.ingredients_details_container, ingredientsFragment)
+                        .commit();
+            }else if(typeString.equalsIgnoreCase("step")){
+                StepDetailsFragment stepDetailsFragment = new StepDetailsFragment();
+                stepDetailsFragment.setArguments(bundle);
+                fragmentManager.beginTransaction()
+                        .add(R.id.ingredients_details_container,stepDetailsFragment)
+                        .commit();
+            }
+
         }
 
     }
 
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putParcelable(BundleConstants.RECIPE_STRING,  recipe);
+        savedInstanceState.putString(BundleConstants.TYPE_STRING,typeString);
+    }
+
     @OnClick(R.id.tv_ingredient)
     void displayIngredientDetails(){
 
-        Toast.makeText(this,"Ingredients are to be displayed", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this,"Ingredients are to be displayed", Toast.LENGTH_SHORT).show();
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences.Editor editor = preferences.edit();
+        typeString = "ingre";
+        editor.putString(BundleConstants.TYPE_STRING,typeString);
+        editor.apply();
+
+
         Bundle bundle = new Bundle();
-        bundle.putParcelable(MainActivity.RECIPE_STRING, recipe);
+        bundle.putParcelable(BundleConstants.RECIPE_STRING, recipe);
         if(Utils.isTablet(getApplicationContext())){
 
             IngredientsFragment ingredientsFragment = new IngredientsFragment();
@@ -83,7 +121,8 @@ public class IngredientAndStepsActivity extends AppCompatActivity implements Ste
                     .commit();
         }else {
             Intent intent = new Intent(this, IngredientStepsDetailsActivity.class);
-            bundle.putString(TYPE_STRING,"ingre");
+            typeString = "ingre";
+            bundle.putString(BundleConstants.TYPE_STRING,typeString);
             intent.putExtras(bundle);
             startActivity(intent);
 
