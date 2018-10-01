@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         SharedPreferences.Editor editor = preferences.edit();
-        
+
         editor.putString(BundleConstants.TYPE_STRING,"ingre");
         editor.apply();
 
