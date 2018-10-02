@@ -17,14 +17,26 @@
         android:background="@color/appBackground"
         >
 
-        <!-- TODO: Update blank fragment layout -->
-        <ImageView
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="280dp"
             android:background="@drawable/layout_background"
             android:padding="5dp"
-            android:layout_margin="10dp"
-            android:id="@+id/iv_back_drop"/>
+            android:layout_margin="10dp">
+
+
+            <ImageView
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:id="@+id/iv_back_drop"/>
+
+            <com.google.android.exoplayer2.ui.SimpleExoPlayerView
+                android:id="@+id/player_view_step"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        </FrameLayout>
+
 
 
 
