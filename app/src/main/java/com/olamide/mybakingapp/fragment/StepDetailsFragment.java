@@ -1,5 +1,6 @@
 package com.olamide.mybakingapp.fragment;
 
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,12 +10,14 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -36,6 +39,7 @@ import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.ui.PlaybackControlView;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
@@ -82,6 +86,10 @@ public class StepDetailsFragment extends Fragment implements Player.EventListene
 
 
 
+    private Dialog mFullScreenDialog;
+    private boolean mExoPlayerFullscreen = false;
+
+
     private SimpleExoPlayer mExoPlayer;
 
     private static MediaSessionCompat mMediaSession;
@@ -102,6 +110,15 @@ public class StepDetailsFragment extends Fragment implements Player.EventListene
 
     @BindView(R.id.step_next)
     FloatingActionButton btNext;
+
+    @BindView(R.id.player_frame)
+    FrameLayout playerFrame;
+
+    @BindView(R.id.exo_fullscreen_button)
+    FrameLayout exoFullscreenButton;
+
+    @BindView(R.id.exo_fullscreen_icon)
+    ImageView mFullScreenIcon;
 
 
 
@@ -156,8 +173,8 @@ public class StepDetailsFragment extends Fragment implements Player.EventListene
         if (savedInstanceState != null){
             recipe = savedInstanceState.getParcelable(BundleConstants.RECIPE_STRING);
             stepList = recipe.getSteps();
-            //currentStep = savedInstanceState.getParcelable(BundleConstants.STEP_STRING);
-            //currentStepInt = savedInstanceState.getInt(BundleConstants.STEP_INT);
+            currentStep = savedInstanceState.getParcelable(BundleConstants.STEP_STRING);
+            currentStepInt = savedInstanceState.getInt(BundleConstants.STEP_INT);
             //currentStep = stepList.get(currentStepInt);
 
 
@@ -176,14 +193,14 @@ public class StepDetailsFragment extends Fragment implements Player.EventListene
                 Bundle testB = getArguments();
                 recipe = testB.getParcelable(BundleConstants.RECIPE_STRING);
                 stepList = recipe.getSteps();
-                //currentStep = testB.getParcelable(BundleConstants.STEP_STRING);
-                //currentStepInt = testB.getInt(BundleConstants.STEP_INT);
+                currentStep = testB.getParcelable(BundleConstants.STEP_STRING);
+                currentStepInt = testB.getInt(BundleConstants.STEP_INT);
             }
         }
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        currentStepInt = preferences.getInt(BundleConstants.STEP_INT,0);
-        currentStep = stepList.get(currentStepInt);
+//
+//        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+//        currentStepInt = preferences.getInt(BundleConstants.STEP_INT,0);
+//        currentStep = stepList.get(currentStepInt);
 
 
         View rootView =  inflater.inflate(R.layout.fragment_step_details, container, false);
@@ -208,10 +225,10 @@ public class StepDetailsFragment extends Fragment implements Player.EventListene
         savedInstanceState.putParcelable(BundleConstants.RECIPE_STRING,  recipe);
         savedInstanceState.putParcelable(BundleConstants.STEP_STRING,currentStep);
         savedInstanceState.putInt(BundleConstants.STEP_INT, currentStepInt);
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt(BundleConstants.STEP_INT, currentStepInt);
-        editor.apply();
+//        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+//        SharedPreferences.Editor editor = preferences.edit();
+//        editor.putInt(BundleConstants.STEP_INT, currentStepInt);
+//        editor.apply();
 
 
         updateStartPosition();
@@ -237,6 +254,7 @@ public class StepDetailsFragment extends Fragment implements Player.EventListene
         }
 
         tvDescription.setText(currentStep.getDescription());
+        initFullscreenDialog();
 
         if(!currentStep.getVideoURL().isEmpty() ){
 
@@ -244,7 +262,11 @@ public class StepDetailsFragment extends Fragment implements Player.EventListene
             ivBackDrop.setVisibility(View.INVISIBLE);
             initializeMediaSession();
             videoUri = Uri.parse(currentStep.getVideoURL());
+
             initializePlayer(videoUri);
+            if(!Utils.isTablet(getContext()) && Utils.isLand(getContext())){
+                openFullscreenDialog();
+            }
 
         }else if(!currentStep.getThumbnailURL().isEmpty()){
 
@@ -252,7 +274,12 @@ public class StepDetailsFragment extends Fragment implements Player.EventListene
             ivBackDrop.setVisibility(View.INVISIBLE);
             initializeMediaSession();
             videoUri =  Uri.parse(currentStep.getThumbnailURL());
+
             initializePlayer(videoUri);
+            if(!Utils.isTablet(getContext()) && Utils.isLand(getContext())){
+                openFullscreenDialog();
+            }
+
         }else {
             playerViewStep.setVisibility(View.INVISIBLE);
             ivBackDrop.setVisibility(View.VISIBLE);
@@ -336,6 +363,7 @@ public class StepDetailsFragment extends Fragment implements Player.EventListene
 
 
     private void releasePlayer() {
+        clearStartPosition();
         if(mExoPlayer!=null){
             mExoPlayer.stop();
             mExoPlayer.release();
@@ -347,10 +375,52 @@ public class StepDetailsFragment extends Fragment implements Player.EventListene
     }
 
 
+    private void initFullscreenDialog() {
+
+        mFullScreenDialog = new Dialog(getContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen) {
+            public void onBackPressed() {
+                if (mExoPlayerFullscreen)
+                    closeFullscreenDialog();
+                super.onBackPressed();
+            }
+        };
+    }
+
+
+    private void openFullscreenDialog() {
+
+        ((ViewGroup) playerViewStep.getParent()).removeView(playerViewStep);
+        mFullScreenDialog.addContentView(playerViewStep, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        mFullScreenIcon.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_fullscreen_shrink));
+        mExoPlayerFullscreen = true;
+        mFullScreenDialog.show();
+    }
+
+    private void closeFullscreenDialog() {
+
+        ((ViewGroup) playerViewStep.getParent()).removeView(playerViewStep);
+        playerFrame.addView(playerViewStep);
+        mExoPlayerFullscreen = false;
+        mFullScreenDialog.dismiss();
+        mFullScreenIcon.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_fullscreen_expand));
+    }
+
+    @OnClick(R.id.exo_fullscreen_button)
+    void processFullScreen(){
+        if (!mExoPlayerFullscreen)
+            openFullscreenDialog();
+        else
+            closeFullscreenDialog();
+
+    }
+
+
+
     @OnClick(R.id.step_prev)
     void goPrevious(){
         currentStepInt--;
         currentStep = stepList.get(currentStepInt);
+
         releasePlayer();
         populateViews();
     }

@@ -79,11 +79,15 @@ public class IngredientAndStepsActivity extends AppCompatActivity implements Ste
                         .add(R.id.ingredients_details_container, ingredientsFragment)
                         .commit();
             }else if(typeString.equalsIgnoreCase("step")){
-                StepDetailsFragment stepDetailsFragment = new StepDetailsFragment();
-                stepDetailsFragment.setArguments(bundle);
-                fragmentManager.beginTransaction()
-                        .add(R.id.ingredients_details_container,stepDetailsFragment)
-                        .commit();
+
+                if(savedInstanceState == null){
+                    StepDetailsFragment stepDetailsFragment = new StepDetailsFragment();
+                    stepDetailsFragment.setArguments(bundle);
+                    fragmentManager.beginTransaction()
+                            .add(R.id.ingredients_details_container,stepDetailsFragment)
+                            .commit();
+                }
+
             }
 
         }

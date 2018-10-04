@@ -83,11 +83,15 @@ public class IngredientStepsDetailsActivity extends AppCompatActivity implements
             bundle.putParcelable(BundleConstants.STEP_STRING, currentStep);
             bundle.putInt(BundleConstants.STEP_INT,currentStepInt);
 
-            StepDetailsFragment stepDetailsFragment = new StepDetailsFragment();
-            stepDetailsFragment.setArguments(bundle);
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.ingredients_details_container__, stepDetailsFragment)
-                    .commit();
+            if(savedInstanceState == null){
+                StepDetailsFragment stepDetailsFragment = new StepDetailsFragment();
+                stepDetailsFragment.setArguments(bundle);
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.ingredients_details_container__, stepDetailsFragment)
+                        .commit();
+            }
+
+
 
         }
 
