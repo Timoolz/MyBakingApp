@@ -284,7 +284,7 @@ public class StepDetailsFragment extends Fragment implements Player.EventListene
             playerViewStep.setVisibility(View.INVISIBLE);
             ivBackDrop.setVisibility(View.VISIBLE);
             Picasso.with(getContext())
-                    .load(R.drawable.errorr)
+                    .load(R.drawable.bake_error)
                     .placeholder(R.drawable.loader)
                     .error(R.drawable.errorr)
                     .into(ivBackDrop);
