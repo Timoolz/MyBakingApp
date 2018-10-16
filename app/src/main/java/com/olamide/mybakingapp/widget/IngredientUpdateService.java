@@ -28,8 +28,6 @@ public class IngredientUpdateService extends IntentService {
     public static final String ACTION_UPDATE_INGREDIENT_WIDGET = "com.olamide.mybakingapp.widget.action.update_ing_widget";
 
 
-    private static final String EXTRA_PARAM1 = "com.olamide.mybakingapp.widget.extra.PARAM1";
-    private static final String EXTRA_PARAM2 = "com.olamide.mybakingapp.widget.extra.PARAM2";
 
     public IngredientUpdateService() {
         super("IngredientUpdateService");

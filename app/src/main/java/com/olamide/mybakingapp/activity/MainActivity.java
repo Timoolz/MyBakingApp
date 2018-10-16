@@ -25,6 +25,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -130,6 +131,10 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
         startActivity(intent);
     }
 
+    @OnClick(R.id.button_retry)
+    void retry(){
+        getRecipeList();
+    }
 
     private void startLoading() {
         textViewWelcome.setVisibility(View.INVISIBLE);
