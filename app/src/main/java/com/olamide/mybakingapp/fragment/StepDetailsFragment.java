@@ -177,11 +177,7 @@ public class StepDetailsFragment extends Fragment implements Player.EventListene
             currentStepInt = savedInstanceState.getInt(BundleConstants.STEP_INT);
             //currentStep = stepList.get(currentStepInt);
 
-
-                //trackSelectorParameters = savedInstanceState.getParcelable(KEY_TRACK_SELECTOR_PARAMETERS);
-                startAutoPlay = savedInstanceState.getBoolean(KEY_AUTO_PLAY);
-                startWindow = savedInstanceState.getInt(KEY_WINDOW);
-                startPosition = savedInstanceState.getLong(KEY_POSITION);
+            getSavedStartPosition(savedInstanceState);
 
 
         }else{
@@ -235,6 +231,18 @@ public class StepDetailsFragment extends Fragment implements Player.EventListene
         savedInstanceState.putBoolean(KEY_AUTO_PLAY, startAutoPlay);
         savedInstanceState.putInt(KEY_WINDOW, startWindow);
         savedInstanceState.putLong(KEY_POSITION, startPosition);
+
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+
+        if(videoUri != null){
+            initializePlayer(videoUri);
+
+        }
 
     }
 
@@ -374,6 +382,16 @@ public class StepDetailsFragment extends Fragment implements Player.EventListene
 
     }
 
+    private void releasePlayerPartially() {
+        if(mExoPlayer!=null){
+            mExoPlayer.release();
+            mExoPlayer = null;
+            updateStartPosition();
+
+        }
+
+    }
+
 
     private void initFullscreenDialog() {
 
@@ -465,6 +483,14 @@ public class StepDetailsFragment extends Fragment implements Player.EventListene
         startAutoPlay = true;
         startWindow = C.INDEX_UNSET;
         startPosition = C.TIME_UNSET;
+    }
+
+    private void getSavedStartPosition(Bundle savedInstanceState){
+
+        //trackSelectorParameters = savedInstanceState.getParcelable(KEY_TRACK_SELECTOR_PARAMETERS);
+        startAutoPlay = savedInstanceState.getBoolean(KEY_AUTO_PLAY);
+        startWindow = savedInstanceState.getInt(KEY_WINDOW);
+        startPosition = savedInstanceState.getLong(KEY_POSITION);
     }
 
     @Override
@@ -612,10 +638,23 @@ public class StepDetailsFragment extends Fragment implements Player.EventListene
         void onFragmentInteraction(Uri uri);
     }
 
+//    @Override
+//    public void onPause() {
+//        super.onPause();
+//
+//        releasePlayerPartially();
+//    }
+//
+    @Override
+    public void onStop() {
+        super.onStop();
+        releasePlayerPartially();
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
-        //releasePlayer();
+        releasePlayer();
     }
 
     private static boolean isBehindLiveWindow(ExoPlaybackException e) {
