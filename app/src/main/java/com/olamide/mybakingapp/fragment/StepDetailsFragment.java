@@ -278,15 +278,21 @@ public class StepDetailsFragment extends Fragment implements Player.EventListene
 
         }else if(!currentStep.getThumbnailURL().isEmpty()){
 
-            playerViewStep.setVisibility(View.VISIBLE);
-            ivBackDrop.setVisibility(View.INVISIBLE);
-            initializeMediaSession();
-            videoUri =  Uri.parse(currentStep.getThumbnailURL());
+            playerViewStep.setVisibility(View.INVISIBLE);
+            ivBackDrop.setVisibility(View.VISIBLE);
+//            initializeMediaSession();
+//            videoUri =  Uri.parse(currentStep.getThumbnailURL());
+//
+//            initializePlayer(videoUri);
+//            if(!Utils.isTablet(getContext()) && Utils.isLand(getContext())){
+//                openFullscreenDialog();
+//            }
 
-            initializePlayer(videoUri);
-            if(!Utils.isTablet(getContext()) && Utils.isLand(getContext())){
-                openFullscreenDialog();
-            }
+            Picasso.with(getContext())
+                    .load(Uri.parse(currentStep.getThumbnailURL()))
+                    .placeholder(R.drawable.loader)
+                    .error(R.drawable.bake_error)
+                    .into(ivBackDrop);
 
         }else {
             playerViewStep.setVisibility(View.INVISIBLE);
